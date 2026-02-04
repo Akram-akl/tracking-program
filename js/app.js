@@ -1023,7 +1023,7 @@ function renderSettings() {
              ${teacherInfoHTML}
              
              <div class="text-center text-xs text-gray-400 mt-8">
-                 <p>مسابقات ابن تيمية - إصدار v4.2.0</p>
+                 <p>برنامج المتابعة - النسخة التجريبية - إصدار v4.2.0</p>
                  <p>جميع الحقوق محفوظة</p>
              </div>
         </div>

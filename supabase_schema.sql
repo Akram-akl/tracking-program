@@ -81,7 +81,8 @@ CREATE TABLE IF NOT EXISTS teachers (
     name TEXT NOT NULL,
     phone TEXT NOT NULL,
     level TEXT NOT NULL,
-    created_at TIMESTAMPTZ DEFAULT NOW()
+    created_at TIMESTAMPTZ DEFAULT NOW(),
+    updated_at TIMESTAMPTZ DEFAULT NOW()
 );
 
 -- 6. Activity Days Table (NEW)
@@ -175,6 +176,21 @@ CREATE POLICY "Allow public delete activity_days" ON activity_days FOR DELETE US
 -- Using DO block to avoid errors if already in publication
 DO $$
 BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND tablename = 'students') THEN
+        ALTER PUBLICATION supabase_realtime ADD TABLE students;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND tablename = 'competitions') THEN
+        ALTER PUBLICATION supabase_realtime ADD TABLE competitions;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND tablename = 'groups') THEN
+        ALTER PUBLICATION supabase_realtime ADD TABLE groups;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND tablename = 'scores') THEN
+        ALTER PUBLICATION supabase_realtime ADD TABLE scores;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND tablename = 'teachers') THEN
+        ALTER PUBLICATION supabase_realtime ADD TABLE teachers;
+    END IF;
     IF NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND tablename = 'activity_days') THEN
         ALTER PUBLICATION supabase_realtime ADD TABLE activity_days;
     END IF;

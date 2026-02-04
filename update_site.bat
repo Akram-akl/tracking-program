@@ -1,7 +1,7 @@
 @echo off
 chcp 65001 >nul
 echo ==========================================
-echo    أداة تحديث الموقع (Ibn Taymiyyah Updater)
+echo    أداة تحديث الموقع (Tracking Program Updater)
 echo ==========================================
 echo.
 echo جاري تحضير الملفات...

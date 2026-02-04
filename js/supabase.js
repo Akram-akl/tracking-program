@@ -5,8 +5,8 @@
 // existing app.js code works with minimal changes.
 // =====================================================
 
-const SUPABASE_URL = 'https://xxcqfqedyymuafqvdtgg.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_0spsK-3jFJ87kmyCc_SCpQ_7fm7uBN8';
+const SUPABASE_URL = 'https://zznrfwufndtvoezzmqzn.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_reuGl8XETFnFxNZMtK_snA_iYVWz5uO';
 
 // Initialize Supabase Client
 const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
@@ -76,6 +76,9 @@ function orderBy(field, direction) {
 // ===== ADD DOCUMENT =====
 async function addDoc(collectionRef, data) {
     const snakeData = toSnakeCase(data);
+    // Remove ID if present to let Supabase handle auto-gen (UUID)
+    delete snakeData.id;
+
     snakeData.created_at = new Date().toISOString();
     snakeData.updated_at = new Date().toISOString();
 
@@ -89,7 +92,10 @@ async function addDoc(collectionRef, data) {
         console.error('addDoc error:', error);
         throw error;
     }
-    return { id: result.id };
+    return {
+        id: result.id,
+        ref: { _table: collectionRef._table, _id: result.id, _type: 'doc' }
+    };
 }
 
 // ===== GET SINGLE DOCUMENT =====
@@ -112,7 +118,8 @@ async function getDoc(docRef) {
     return {
         exists: () => true,
         data: () => toCamelCase(data),
-        id: data.id
+        id: data.id,
+        ref: { _table: docRef._table, _id: data.id, _type: 'doc' }
     };
 }
 
@@ -144,10 +151,10 @@ async function getDocs(queryOrCollection) {
         throw error;
     }
 
-    const docs = (data || []).map(doc => ({
-        id: doc.id,
-        data: () => toCamelCase(doc),
-        ref: doc
+    const docs = (data || []).map(row => ({
+        id: row.id,
+        data: () => toCamelCase(row),
+        ref: { _table: tableName, _id: row.id, _type: 'doc' }
     }));
 
     return {
@@ -190,7 +197,6 @@ async function deleteDoc(docRef) {
 // ===== REALTIME SUBSCRIPTION (onSnapshot) =====
 function onSnapshot(queryOrCollection, callback) {
     const tableName = queryOrCollection._table;
-    const constraints = queryOrCollection._constraints || [];
 
     // Initial fetch
     getDocs(queryOrCollection).then(callback).catch(console.error);
@@ -229,6 +235,7 @@ function writeBatch(db) {
             operations.push({ type: 'delete', ref: docRef });
         },
         set: (docRef, data) => {
+            // For Supabase, set is often add or update. In app.js contexts, usually add.
             operations.push({ type: 'set', ref: docRef, data: data });
         },
         update: (docRef, data) => {
@@ -239,6 +246,7 @@ function writeBatch(db) {
                 if (op.type === 'delete') {
                     await deleteDoc(op.ref);
                 } else if (op.type === 'set') {
+                    // Ignore the provided ID in batch.set if it exists (usually "temp_sid")
                     await addDoc({ _table: op.ref._table }, op.data);
                 } else if (op.type === 'update') {
                     await updateDoc(op.ref, op.data);
