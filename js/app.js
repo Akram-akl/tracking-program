@@ -181,7 +181,11 @@ function showAuthModal() {
 
 function handleLogin(type) {
     // type: 'student' | 'teacher' | 'parent'
+    // Hide ALL panels first to support switching between them
     $('#auth-options-panel').classList.add('hidden');
+    $('#student-login-panel').classList.add('hidden');
+    $('#teacher-login-panel').classList.add('hidden');
+    $('#parent-login-panel').classList.add('hidden');
 
     if (type === 'student') {
         $('#student-login-panel').classList.remove('hidden');
