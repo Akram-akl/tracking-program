@@ -199,98 +199,6 @@ function backToAuthHome() {
     $('#auth-options-panel').classList.remove('hidden');
 }
 
-// --- Passwords Info Modal ---
-function showPasswordsInfo(role) {
-    const modal = $('#passwords-info-modal');
-    const content = $('#passwords-info-content');
-
-    if (!modal || !content) return;
-
-    // Build content based on role
-    if (role === 'student' || role === 'teacher') {
-        // Show passwords table
-        let html = `
-            <div class="space-y-4">
-                <div class="bg-gradient-to-br from-teal-50 to-blue-50 dark:from-teal-900/20 dark:to-blue-900/20 rounded-xl p-4 border border-teal-200 dark:border-teal-800">
-                    <h4 class="font-bold text-sm mb-3 text-teal-900 dark:text-teal-100">باسوردات المراحل:</h4>
-                    <div class="space-y-2">
-        `;
-
-        // Add each level's passwords
-        Object.entries(LEVELS).forEach(([key, config]) => {
-            const passType = role === 'teacher' ? 'teacherPass' : 'studentPass';
-            const passLabel = role === 'teacher' ? 'معلم' : 'طالب';
-            html += `
-                <div class="bg-white dark:bg-gray-800 rounded-lg p-3 flex items-center justify-between">
-                    <div class="flex items-center gap-2">
-                        <span class="text-xl">${config.emoji}</span>
-                        <span class="text-sm font-medium">${config.name}</span>
-                    </div>
-                    <div class="flex items-center gap-2">
-                        <span class="text-xs text-gray-500">${passLabel}:</span>
-                        <code class="bg-gray-100 dark:bg-gray-700 px-3 py-1 rounded font-mono text-sm font-bold">${config[passType]}</code>
-                    </div>
-                </div>
-            `;
-        });
-
-        html += `
-                    </div>
-                </div>
-        `;
-
-        // Add master password for teachers only
-        if (role === 'teacher') {
-            html += `
-                <div class="bg-gradient-to-br from-purple-50 to-pink-50 dark:from-purple-900/20 dark:to-pink-900/20 rounded-xl p-4 border border-purple-200 dark:border-purple-800">
-                    <h4 class="font-bold text-sm mb-2 text-purple-900 dark:text-purple-100">الباسوورد الشامل:</h4>
-                    <div class="bg-white dark:bg-gray-800 rounded-lg p-3 flex items-center justify-between">
-                        <div class="flex items-center gap-2">
-                            <span class="text-xl">🔐</span>
-                            <span class="text-sm font-medium">الوصول لجميع المراحل</span>
-                        </div>
-                        <code class="bg-purple-100 dark:bg-purple-900/50 px-3 py-1 rounded font-mono text-sm font-bold text-purple-700 dark:text-purple-300">${MASTER_TEACHER_PASS}</code>
-                    </div>
-                    <p class="text-xs text-purple-600 dark:text-purple-400 mt-2">يمكنك استخدام هذا الباسوورد للدخول لأي مرحلة</p>
-                </div>
-            `;
-        }
-
-        html += `
-            </div>
-        `;
-
-        content.innerHTML = html;
-    } else if (role === 'parent') {
-        // Show parent instructions
-        content.innerHTML = `
-            <div class="space-y-4">
-                <div class="bg-amber-50 dark:bg-amber-900/20 rounded-xl p-4 border border-amber-200 dark:border-amber-800">
-                    <h4 class="font-bold text-sm mb-2 text-amber-900 dark:text-amber-100">📱 كيفية الدخول كولي أمر:</h4>
-                    <ol class="text-sm text-gray-700 dark:text-gray-300 space-y-2 list-decimal list-inside">
-                        <li>يجب أن يكون المعلم قد سجل رقم جوالك مسبقاً</li>
-                        <li>أدخل رقم جوالك المسجل في النظام</li>
-                        <li>سيتم البحث عن جميع الطلاب المرتبطين برقمك</li>
-                    </ol>
-                </div>
-                <div class="bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 border border-blue-200 dark:border-blue-800">
-                    <h4 class="font-bold text-sm mb-2 text-blue-900 dark:text-blue-100">❓ لم يتم تسجيل رقمك؟</h4>
-                    <p class="text-sm text-gray-700 dark:text-gray-300">تواصل مع المعلم لتسجيل رقم جوالك عند إضافة الطالب في النظام</p>
-                </div>
-            </div>
-        `;
-    }
-
-    modal.classList.remove('hidden');
-    lucide.createIcons();
-}
-
-function closePasswordsInfoModal() {
-    const modal = $('#passwords-info-modal');
-    if (modal) modal.classList.add('hidden');
-}
-
-
 function performStudentLogin() {
     const levelKey = $('#student-level-select').value;
     const password = $('#student-password-input').value;
@@ -359,6 +267,51 @@ function finishTeacherLogin(levelKey) {
     state.currentLevel = levelKey;
     state.isTeacher = true;
     completeLogin();
+}
+
+// --- Password Visibility Toggle ---
+function toggleLoginPasswords(elementId) {
+    const el = document.getElementById(elementId);
+    if (!el) return;
+
+    // Toggle visibility
+    if (el.classList.contains('hidden')) {
+        el.classList.remove('hidden');
+        populatePasswordList(elementId);
+    } else {
+        el.classList.add('hidden');
+    }
+}
+
+function populatePasswordList(elementId) {
+    const el = document.getElementById(elementId);
+    if (!el) return;
+
+    let html = '';
+
+    if (elementId === 'teacher-pass-list') {
+        html += `<div class="flex justify-between items-center border-b border-gray-200 dark:border-gray-600 pb-1 mb-1">
+                    <span class="font-bold text-purple-600">الماستر (الشامل)</span>
+                    <span class="font-mono bg-purple-100 dark:bg-purple-900 px-2 rounded">${MASTER_TEACHER_PASS}</span>
+                 </div>`;
+
+        Object.entries(LEVELS).forEach(([key, conf]) => {
+            html += `<div class="flex justify-between items-center">
+                        <span>${conf.name} ${conf.emoji}</span>
+                        <span class="font-mono bg-gray-100 dark:bg-gray-700 px-2 rounded text-gray-600 dark:text-gray-300">${conf.teacherPass}</span>
+                     </div>`;
+        });
+    }
+    else if (elementId === 'student-pass-list') {
+        Object.entries(LEVELS).forEach(([key, conf]) => {
+            html += `<div class="flex justify-between items-center">
+                        <span>${conf.name} ${conf.emoji}</span>
+                        <span class="font-mono bg-gray-100 dark:bg-gray-700 px-2 rounded text-gray-600 dark:text-gray-300">${conf.studentPass}</span>
+                     </div>`;
+        });
+    }
+
+    el.innerHTML = html;
 }
 
 // --- Parent Login ---

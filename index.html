@@ -162,11 +162,17 @@
                                 تسجيل الدخول
                             </button>
 
-                            <button onclick="showPasswordsInfo('student')" type="button"
-                                class="w-full py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 font-medium rounded-xl mt-2 transition flex items-center justify-center gap-2">
-                                <i data-lucide="info" class="w-4 h-4"></i>
-                                عرض الباسوردات
-                            </button>
+                            <!-- Show Passwords Toggle -->
+                            <div class="pt-4 border-t border-gray-100 dark:border-gray-700">
+                                <button onclick="toggleLoginPasswords('student-pass-list')"
+                                    class="text-xs text-gray-400 hover:text-teal-600 underline w-full text-center mb-2">
+                                    عرض كلمات المرور
+                                </button>
+                                <div id="student-pass-list"
+                                    class="hidden bg-gray-50 dark:bg-gray-800 rounded-xl p-3 text-xs space-y-2 border border-gray-200 dark:border-gray-700">
+                                    <!-- Injected via JS -->
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -204,11 +210,17 @@
                                 تحقق
                             </button>
 
-                            <button onclick="showPasswordsInfo('teacher')" type="button"
-                                class="w-full py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 font-medium rounded-xl mt-2 transition flex items-center justify-center gap-2">
-                                <i data-lucide="info" class="w-4 h-4"></i>
-                                عرض الباسوردات
-                            </button>
+                            <!-- Show Passwords Toggle -->
+                            <div class="pt-4 border-t border-gray-100 dark:border-gray-700">
+                                <button onclick="toggleLoginPasswords('teacher-pass-list')"
+                                    class="text-xs text-gray-400 hover:text-purple-600 underline w-full text-center mb-2">
+                                    عرض كلمات المرور
+                                </button>
+                                <div id="teacher-pass-list"
+                                    class="hidden bg-gray-50 dark:bg-gray-800 rounded-xl p-3 text-xs space-y-2 border border-gray-200 dark:border-gray-700">
+                                    <!-- Injected via JS -->
+                                </div>
+                            </div>
                         </div>
 
                         <!-- Step 3: Teacher Level Selection (Only if Master Pass) -->
@@ -233,10 +245,8 @@
                                 <div
                                     class="w-20 h-20 bg-amber-100 dark:bg-amber-900 rounded-full flex items-center justify-center text-4xl mx-auto mb-4">
                                     👨‍👩‍👧‍👦</div>
-                                <p class="text-sm text-gray-700 dark:text-gray-300 font-medium mb-2">أدخل رقم جوالك
-                                    المسجل لدى المعلم</p>
-                                <p class="text-xs text-gray-500">يجب أن يكون المعلم قد سجل رقم جوالك مسبقاً عند إضافة
-                                    الطالب</p>
+                                <p class="text-sm text-gray-500">أدخل رقم جوالك المسجل لدى المعلم<br>لمتابعة أداء أبنائك
+                                </p>
                             </div>
 
                             <div>
@@ -244,8 +254,9 @@
                                 <input type="tel" id="parent-phone-input" dir="ltr"
                                     class="w-full bg-gray-50 dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 rounded-xl px-4 py-3 text-center text-lg focus:outline-none focus:border-amber-500"
                                     placeholder="05xxxxxxxx أو 966xxxxxxx" inputmode="tel">
-                                <p class="text-xs text-gray-400 mt-1 text-center">الأرقام السعودية: أدخل 05 أو
-                                    966<br>الأرقام الدولية: أدخلها كما هي</p>
+                                <p class="text-xs text-gray-400 mt-1 text-center font-bold text-amber-600">
+                                    يجب التسجيل بنفس رقم ولي الأمر الذي سجله المعلم للطالب
+                                </p>
                             </div>
 
                             <button onclick="performParentLogin()"
@@ -253,12 +264,10 @@
                                 🔍 البحث عن أبنائي
                             </button>
 
-                            <div class="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-                                <p class="text-xs text-gray-500 text-center mb-2">لم يتم تسجيل رقمك بعد؟</p>
-                                <button onclick="backToAuthHome(); setTimeout(() => handleLogin('teacher'), 100);"
-                                    type="button"
-                                    class="w-full py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-200 font-medium rounded-xl transition">
-                                    التسجيل باستخدام معلم
+                            <div class="pt-4 border-t border-gray-100 dark:border-gray-700 text-center">
+                                <button onclick="handleLogin('teacher')"
+                                    class="text-xs text-gray-500 hover:text-purple-600 underline">
+                                    الانتقال للتسجيل باستخدام معلم
                                 </button>
                             </div>
                         </div>
@@ -359,28 +368,6 @@
                     <button onclick="submitPasswordModal()"
                         class="flex-1 py-3 bg-teal-600 text-white rounded-xl font-bold hover:bg-teal-700">تأكيد</button>
                 </div>
-            </div>
-        </div>
-
-        <!-- Passwords Info Modal -->
-        <div id="passwords-info-modal"
-            class="fixed inset-0 bg-black/60 z-[90] hidden flex items-center justify-center p-4 backdrop-blur-sm">
-            <div
-                class="bg-white dark:bg-gray-800 rounded-2xl w-full max-w-md p-6 shadow-2xl max-h-[80vh] overflow-y-auto">
-                <div class="flex justify-between items-center mb-4">
-                    <h3 class="font-bold text-lg">🔑 معلومات الباسوردات</h3>
-                    <button onclick="closePasswordsInfoModal()" title="إغلاق"
-                        class="p-2 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition">
-                        <i data-lucide="x" class="w-5 h-5"></i>
-                    </button>
-                </div>
-                <div id="passwords-info-content">
-                    <!-- Content will be injected by JS -->
-                </div>
-                <button onclick="closePasswordsInfoModal()"
-                    class="w-full py-3 bg-teal-600 hover:bg-teal-700 text-white font-bold rounded-xl mt-4 transition">
-                    فهمت
-                </button>
             </div>
         </div>
 
